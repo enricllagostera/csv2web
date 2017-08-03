@@ -25,7 +25,7 @@ const Mustache = require('mustache');
 const md = require("markdown").markdown;
 const csv = require("csvtojson");
 
-var csvData = { info: [] };
+var csvData = { rows: [] };
 
 function DataType(info) {
     switch (info) {
@@ -77,7 +77,7 @@ csv({
                 jsonObj[field] = md.toHTML(jsonObj[field]);
             }
         }
-        csvData.info.push(jsonObj);
+        csvData.rows.push(jsonObj);
     })
     .on('done', function (error) {
         if (error) {
