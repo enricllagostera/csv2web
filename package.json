@@ -1,0 +1,22 @@
+{
+  "name": "csv2web",
+  "version": "0.0.1",
+  "description": "a simple CLI script to create websites from csv tables, using markdown for writing, mustache for templating and html/css for presentation.",
+  "main": "index.js",
+  "entry point": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Enric Llagostera",
+  "license": "ISC",
+  "dependencies": {
+    "command-line-args": "^4.0.6",
+    "csvtojson": "^1.1.4",
+    "markdown": "^0.5.0",
+    "mustache": "^2.3.0"
+  },
+  "bin": {
+    "csv2web": "./index.js"
+  }
+}
