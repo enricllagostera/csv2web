@@ -1,16 +1,49 @@
 #!/usr/bin/env node
 
-// Descriptors for the CLI parser
+// Descriptors for the CLI parser and usage guide
 const commandLineArgs = require('command-line-args');
 const optionDefinitions = [
-    { name: 'help', alias :'h', type: Boolean, defaultValue: false, description: 'Print this usage guide.'},
-    { name: 'dataType', alias: 'd', type: DataType, defaultValue: "auto", description: 'Define the format of the data file being processed.', typeLabel: '"csv", "tsv" or "auto"'},
-    { name: 'inputData', alias: 'i', type: String, defaultValue: "data.csv", typeLabel:'CSV or TSV file', description: 'Input file with data to be parsed.'},
-    { name: 'template', alias: 't', type: String, defaultValue: "template.mustache", typeLabel:'Mustache file', description:'A template for rendering the data into HTML.' },
-    { name: 'htmlOutput', alias: 'o', type: String, defaultValue: "index.html", typeLabel:'HTML file', description: '(optional) An HTML file for output.' }
+    { 
+        name: 'help', 
+        alias :'h', 
+        type: Boolean, 
+        defaultValue: false, 
+        description: 'Print this usage guide.'
+    },
+    {
+        name: 'dataType', 
+        alias: 'd', 
+        type: DataType, 
+        defaultValue: "auto", 
+        description: 'Define the format of the data file being processed.', 
+        typeLabel: '"csv", "tsv" or "auto"'
+    },
+    { 
+        name: 'inputData', 
+        alias: 'i', 
+        type: String, 
+        defaultValue: "data.csv", 
+        typeLabel:'CSV or TSV file', 
+        description: 'Input file with data to be parsed.'
+    },
+    { 
+        name: 'template', 
+        alias: 't', 
+        type: String, 
+        defaultValue: "template.mustache", 
+        typeLabel:'Mustache file', description:'A template for rendering the data into HTML.' 
+    },
+    {
+        name: 'htmlOutput', 
+        alias: 'o', 
+        type: String, 
+        defaultValue: "index.html", 
+        typeLabel:'HTML file', 
+        description: '(optional) An HTML file for output.'
+    }
 ]
 let cliArgs = {};
-
+// Usage guide setup
 const getUsage = require('command-line-usage');
 const sections = [
   {
@@ -23,31 +56,12 @@ const sections = [
   }
 ];
 const usage = getUsage(sections);
-
-// some error handling for wrong flags
-try {
-    
-    cliArgs = commandLineArgs(optionDefinitions);
-} catch (error) {
-    console.log("Impossible to run CSV2WEB: " + error + ". Run 'csv2web --help' for more info.");
-    process.exit(1);
-}
-
-// only display help and quit
-if(cliArgs.help){
-    console.log(usage);
-    process.exit(0);
-}
-
-console.log("Running CSV2WEB...");
-console.log("Execution Info | " + cliArgs.dataType.toUpperCase() + " MODE | I: " + cliArgs.inputData + " T: " + cliArgs.template + " O: " + cliArgs.htmlOutput);
-
+// Other modules setup: file system, markdown, CSV/TSV parsers
 const fs = require('fs');
 const Mustache = require('mustache');
 const md = require("markdown").markdown;
 const csv = require("csvtojson");
-
-var csvData = { rows: [] };
+let csvData = { rows: [] };
 
 function DataType(info) {
     switch (info) {
@@ -103,11 +117,32 @@ function writeHtml(html) {
     });
 }
 
+/** MAIN - Running the app itself. */
+
+// 1st - Some error handling for wrong flags & parameters after parsing CLI args
+try {
+    cliArgs = commandLineArgs(optionDefinitions);
+} catch (error) {
+    console.log("Impossible to run CSV2WEB: " + error + ". Run 'csv2web --help' for more info.");
+    process.exit(1);
+}
+
+// 2nd - Deals with help and shows usage guide
+if(cliArgs.help){
+    console.log(usage);
+    process.exit(0);
+}
+
+// Proper execution of the app
+console.log("Running CSV2WEB...");
+console.log("Execution Info | " + cliArgs.dataType.toUpperCase() + " MODE | I: " + cliArgs.inputData + " T: " + cliArgs.template + " O: " + cliArgs.htmlOutput);
+
 csv({
         ignoreEmpty: true,
         delimiter: getDelimiter()
     })
     .fromFile(cliArgs.inputData)
+    // In each row, process the markdown columns into HTML
     .on('json', function (jsonObj) {
         for (var field in jsonObj) {
             if (field.indexOf("md_") == 0) {
@@ -116,6 +151,7 @@ csv({
         }
         csvData.rows.push(jsonObj);
     })
+    // After the whole file is parsed, the JSON is ready for rendering
     .on('done', function (error) {
         if (error) {
             throw error;

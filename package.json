@@ -1,6 +1,6 @@
 {
   "name": "csv2web",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a simple CLI script to create websites from csv tables, using markdown for writing, mustache for templating and html/css for presentation.",
   "main": "index.js",
   "entry point": "index.js",
