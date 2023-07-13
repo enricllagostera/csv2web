@@ -13,9 +13,9 @@
   "dependencies": {
     "command-line-args": "^4.0.6",
     "command-line-usage": "^4.0.0",
-    "csvtojson": "^1.1.4",
+    "csvtojson": "^1.1.12",
     "markdown": "^0.5.0",
-    "mustache": "^2.3.0"
+    "mustache": "^2.3.2"
   },
   "bin": {
     "csv2web": "./index.js"
